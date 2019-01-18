@@ -1,5 +1,5 @@
 settings = {
-  'SETTING_NAME': 'qunar_detail_spider.qunar_detail',
+  'SETTING_NAME': 'inital_redis_key_spider.inital_redis_key',
   'DOWNLOADER_MIDDLEWARES': {
     'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
     'sights.downloader_middlewares.RandomUserAgentMiddleware': 500,
@@ -10,6 +10,6 @@ settings = {
     'sights.downloader_middlewares.ProxyMiddleware': 800,
   },
   'ITEM_PIPELINES': {
-    'sights.pipelines.SightsPipeline': 300
-  }
+    'sights.pipelines.PageUrlsPipeline': 300
+  },
 }

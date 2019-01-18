@@ -17,7 +17,9 @@ class AddrProxy():
     '''
     api = 'random'
     res = self.requestApi(api)
-    return res.text
+    if res:
+      return res.text
+    return None
     
   def isIpExist(self, ip):
     api = 'exist/{}'.format(ip)

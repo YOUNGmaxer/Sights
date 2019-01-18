@@ -14,6 +14,8 @@ class SightsItem(scrapy.Item):
   address = Field()
   # 景点销量
   sale_count = Field()
+  # 城市
+  city = Field()
 
 class SightsDetailItem(scrapy.Item):
   # 景点id
@@ -24,6 +26,8 @@ class SightsDetailItem(scrapy.Item):
   star_score = Field()
   # 景点起步价
   basic_price = Field()
+  # 城市
+  city = Field()
   '''
   景点评论分布
   :key all: 全部评论数
@@ -37,3 +41,7 @@ class SightsDetailItem(scrapy.Item):
   :key 某特点: 评论数
   '''
   tags = Field()
+
+class SightsPageItem(scrapy.Item):
+  url = Field()
+  page = Field()

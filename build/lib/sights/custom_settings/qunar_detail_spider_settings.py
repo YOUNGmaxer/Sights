@@ -1,5 +1,5 @@
 settings = {
-  'SETTING_NAME': 'qunar_detail_spider.qunar-detail',
+  'SETTING_NAME': 'qunar_detail_spider.qunar_detail',
   'DOWNLOADER_MIDDLEWARES': {
     'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
     'sights.downloader_middlewares.RandomUserAgentMiddleware': 500,

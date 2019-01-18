@@ -5,32 +5,45 @@ from sights.items import SightsDetailItem
 from sights.items import SightsItem
 from sights.custom_settings import qunar_detail_spider_settings
 from sights.utils import url
+from scrapy_redis.spiders import RedisCrawlSpider
 from urllib import parse
 import re
 
-class SightDetailSpider(CrawlSpider):
-  name = 'qunar-detail'
-  keyword = '普宁'
+# 注意如果使用 scrapy-redis，这里最好应该继承 RedisCrawlSpider
+class SightDetailSpider(RedisCrawlSpider):
+  name = 'qunar_detail'
+  # keyword = '汕头'
   proxy = None
-  start_urls = [ f'http://piao.qunar.com/ticket/list.htm?keyword={keyword}' ]
+  # 使用 redis_key 避免多个爬虫都从同一起点去开始爬取
+  redis_key = f'{name}:start_urls'
   custom_settings = qunar_detail_spider_settings.settings
 
   rules = (
+    # Rule(
+    #   LinkExtractor(restrict_xpaths='//div[@class="pager"]/a[@class="next"]'),
+    #   callback='parse_start_url',
+    #   follow=True
+    # ),
     Rule(
-      LinkExtractor(restrict_xpaths='//div[@class="pager"]/a[@class="next"]'),
+      LinkExtractor(allow_domains='t.tt'),
+      # None,
       callback='parse_start_url',
-      follow=True
     ),
     Rule(
       LinkExtractor(restrict_xpaths='//div[@class="sight_item_about"]//a[@class="name"]',),
-      callback='parse_item'
-    )
+      callback='parse_item',
+    ),
   )
+  
+  # 此处重写可能带来了 scrapy-redis 无法使用去重功能
+  # def _build_request(self, rule, link):
+  #   r = Request(url=link.url, callback=self._response_downloaded, dont_filter=True)
+  #   r.meta.update(rule=rule, link_text=link.text)
+  #   return r
 
-  def _build_request(self, rule, link):
-    r = Request(url=link.url, callback=self._response_downloaded, dont_filter=True)
-    r.meta.update(rule=rule, link_text=link.text)
-    return r
+  # 重写 Spider 对象中 make_requests_from_url，因为这个方法将被废弃
+  # def make_requests_from_url(self, url):
+  #   return Request(url)
 
   def parse_item(self, response):
     print('parse_item', '状态', response.status)
@@ -43,12 +56,15 @@ class SightDetailSpider(CrawlSpider):
     tags = self.packCommentTags(self.parseCommentTags(commentList))
     item['comment'] = tags[0]
     item['tags'] = tags[1]
+    content = response.xpath('//meta[@name="location"]/@content').extract_first()
+    item['city'] = re.search(r'city=([^;]*)', content).group(1)
     yield item
 
-  # [重写] 处理 start_urls 返回 response
+  # 用于处理景点列表页
   def parse_start_url(self, response):
     # 获取景点列表
     page_list = response.xpath('//div[@class="result_list"]/div[contains(@class, "sight_item")]')
+    # next_url = response.xpath('//div[@class="pager"]/a[@class="next"]/@href').extract_first()
     page_num = url.getQueryParam(response.url, 'page')
     print(f'正在爬取第 {page_num} 页数据')
     for page_item in page_list:
@@ -59,7 +75,14 @@ class SightDetailSpider(CrawlSpider):
       item['point'] = self.extractItem(page_item, 'data-point').split(',')
       item['address'] = self.extractItem(page_item, 'data-address')
       item['sale_count'] = self.extractItem(page_item, 'data-sale-count')
+      content = response.xpath('//meta[@name="location"]/@content').extract_first()
+      item['city'] = re.search(r'city=([^;]*)', content).group(1)
+      # item['city'] = url.getQueryParam(response.url, 'keyword')
       yield item
+
+  # [重写] 处理 start_urls 返回 response
+  # def parse_start_url(self, response):
+  #   return None
 
   def extractItem(self, page_item, data_info):
     return page_item.css(f'div.sight_item::attr({data_info})').extract_first()

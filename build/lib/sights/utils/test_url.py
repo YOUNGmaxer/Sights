@@ -11,6 +11,12 @@ class TestUrl(unittest.TestCase):
     param = 'page'
     value = urltool.getQueryParam(self.url, param)
     self.assertEqual(value, '3657')
+  
+  def test_getQueryParam__case1_1(self):
+    param = 'keyword'
+    url = 'http://piao.qunar.com/ticket/list.htm?keyword=%E5%85%AD%E7%9B%98%E6%B0%B4%E5%B8%82&page=1'
+    value = urltool.getQueryParam(url, param)
+    self.assertEqual(value, '六盘水市')
 
   def test_getQueryParam__case2(self):
     '''

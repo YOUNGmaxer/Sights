@@ -4,6 +4,7 @@ from sights.utils.ip_proxy import AddrProxy
 from scrapy.downloadermiddlewares.retry import RetryMiddleware
 from scrapy.downloadermiddlewares.redirect import RedirectMiddleware
 from scrapy.crawler import Crawler
+from scrapy import Request
 
 logger = logging.getLogger(__name__)
 
@@ -37,13 +38,21 @@ class RandomUserAgentMiddleware():
 # 用于处理代理的中间件
 class ProxyMiddleware():
   def process_request(self, request, spider):
-    print('进入 ProxyMiddleware')
-    print('spider.proxy', spider.proxy)
+    print('进入 ProxyMiddleware', spider.proxy)
+    # 确保代理 ip 能被暂时沿用
     if spider.proxy:
       request.meta['proxy'] = spider.proxy
     # 赋值代理的判断条件为 retry_times, 即第一次请求失败之后才启用代理
     if request.meta.get('retry_times'):
       updateProxy(request, spider)
+  
+  def process_response(self, request, response, spider):
+    if response.status == 403:
+      print('403 告警')
+      _set_retry(request)
+      return request
+    return response
+
 
 class LocalRetryMiddleware(RetryMiddleware):
   def process_response(self, request, response, spider):
@@ -55,7 +64,6 @@ class LocalRetryMiddleware(RetryMiddleware):
     if page_error:
       print('[爬虫异常]:发现 去哪儿 数据错误页面，需要更换代理ip重新发送请求')
       print('当前请求ip', request.meta.get('proxy'))
-      print('请求信息', request)
       return self._retry(request, response.status, spider) or response
     return response
 
@@ -67,17 +75,18 @@ class LocalRedirectMiddleware(RedirectMiddleware):
       return super()._redirect(redirected, request, spider, reason)
     print(f'发现反爬虫防御重定向 {request.url}')
     updateProxy(request, spider)
-    # 如果返回 request 对象，那么重新调度下载
+    # 如果返回 request 对象，那么重新调度下载，并添加一个随机值
+    request.url = f'{request.url}&redirectkey={random.random()}'
     return request
 
   def _is_qunar_defense_url(self, url):
     return '//piao.qunar.com/captcha/pc.htm?captchaRequestURI' in url
 
-  # 设置为一次重试
-  def _set_retry(self, request):
-    retries = request.meta.get('retry_times', 0) + 1
-    print(f'重试次数 {retries}')
-    request.meta['retry_times'] = retries
+# 设置为一次重试
+def _set_retry(request):
+  retries = request.meta.get('retry_times', 0) + 1
+  print(f'重试次数 {retries}')
+  request.meta['retry_times'] = retries
 
 # 获取并更新代理
 def updateProxy(request, spider):
