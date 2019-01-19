@@ -12,21 +12,15 @@ import re
 # 注意如果使用 scrapy-redis，这里最好应该继承 RedisCrawlSpider
 class SightDetailSpider(RedisCrawlSpider):
   name = 'qunar_detail'
-  # keyword = '汕头'
   proxy = None
   # 使用 redis_key 避免多个爬虫都从同一起点去开始爬取
   redis_key = f'{name}:start_urls'
   custom_settings = qunar_detail_spider_settings.settings
 
   rules = (
-    # Rule(
-    #   LinkExtractor(restrict_xpaths='//div[@class="pager"]/a[@class="next"]'),
-    #   callback='parse_start_url',
-    #   follow=True
-    # ),
+    # 此处 LinkExtractor 无意义
     Rule(
       LinkExtractor(allow_domains='t.tt'),
-      # None,
       callback='parse_start_url',
     ),
     Rule(
