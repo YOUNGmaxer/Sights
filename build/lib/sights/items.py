@@ -45,3 +45,24 @@ class SightsDetailItem(scrapy.Item):
 class SightsPageItem(scrapy.Item):
   url = Field()
   page = Field()
+
+# 用于添加 rid 或补充信息
+class SightsIdItem(SightsDetailItem):
+  rid = Field()
+
+# 用于存储评论信息
+class CommentItem(scrapy.Item):
+  # rid
+  rid = Field()
+  # 评论用户
+  author = Field()
+  # 评论内容
+  content = Field()
+  # 评论时间
+  date = Field()
+  # 评论分数
+  score = Field()
+  # 评论id
+  commentId = Field()
+  # 用户昵称
+  userNickName = Field()

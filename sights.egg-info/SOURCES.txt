@@ -6,6 +6,7 @@ sights/items.py
 sights/middlewares.py
 sights/pipelines.py
 sights/settings.py
+sights/spider_middlewares.py
 sights.egg-info/PKG-INFO
 sights.egg-info/SOURCES.txt
 sights.egg-info/dependency_links.txt
@@ -13,6 +14,7 @@ sights.egg-info/entry_points.txt
 sights.egg-info/top_level.txt
 sights/custom_settings/__init__.py
 sights/custom_settings/inital_redis_key_spider_settings.py
+sights/custom_settings/qunar_comment_spider_settings.py
 sights/custom_settings/qunar_detail_spider_settings.py
 sights/custom_settings/qunar_sights_spider_settings.py
 sights/dbs/__init__.py
@@ -22,6 +24,8 @@ sights/dbs/test_mongoBase.py
 sights/dbs/test_redisBase.py
 sights/spiders/__init__.py
 sights/spiders/inital_redis_key_spider.py
+sights/spiders/inital_sights_key_spider.py
+sights/spiders/qunar_comment_spider.py
 sights/spiders/qunar_detail_spider.py
 sights/spiders/qunar_sights_spider.py
 sights/utils/__init__.py

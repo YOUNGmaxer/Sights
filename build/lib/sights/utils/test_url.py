@@ -17,6 +17,18 @@ class TestUrl(unittest.TestCase):
     url = 'http://piao.qunar.com/ticket/list.htm?keyword=%E5%85%AD%E7%9B%98%E6%B0%B4%E5%B8%82&page=1'
     value = urltool.getQueryParam(url, param)
     self.assertEqual(value, '六盘水市')
+  
+  def test_getQueryParam__case1_2(self):
+    param = 'flag'
+    url = 'http://piao.qunar.com/ticket/detail_775187833.html?flag=1'
+    value = urltool.getQueryParam(url, param)
+    self.assertEqual(value, '1')
+  
+  def test_getQueryParam__case1_3(self):
+    param = 'flag'
+    url = 'http://piao.qunar.com/ticket/detail_775187833.html'
+    value = urltool.getQueryParam(url, param)
+    self.assertIsNone(value)
 
   def test_getQueryParam__case2(self):
     '''

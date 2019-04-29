@@ -33,6 +33,8 @@ ROBOTSTXT_OBEY = True
 DOWNLOADER_MIDDLEWARES = {
   'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
   'sights.downloader_middlewares.RandomUserAgentMiddleware': 500,
+  'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
+  'sights.downloader_middlewares.LocalRetryMiddleware': 550,
   'scrapy.downloadermiddlewares.redirect.RedirectMiddleware': None,
   'sights.downloader_middlewares.LocalRedirectMiddleware': 600,
   'sights.downloader_middlewares.ProxyMiddleware': 800,
@@ -44,8 +46,11 @@ ITEM_PIPELINES = {
 
 }
 
+# 最大重试次数
+RETRY_TIMES = 4
+
 # 下载延迟
-DOWNLOAD_DELAY = 0.8
+DOWNLOAD_DELAY = 1
 
 # 配置 Scrapy-Redis
 # SCHEDULER = 'scrapy_redis.scheduler.Scheduler'
